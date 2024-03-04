@@ -1,11 +1,11 @@
 import { app } from './firebase/config';
 import 'firebase/auth';
 
-export const signInWithNameAndPassword = async (username, password) => {
+export const signInWithEmailAndPassword = async (email, password) => {
   const auth = app.auth();
 
   try {
-    await auth.signInWithNameAndPassword(`${username}@example.com`, password);
+    await auth.signInWithEmailAndPassword(email, password);
     console.log('User signed in successfully.');
   } catch (error) {
     throw error;

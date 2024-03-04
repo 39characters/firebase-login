@@ -1,7 +1,5 @@
-import './App.css'
 import React, { useState } from 'react';
 import { app } from './firebase/config';
-import SignInForm from './SignIn';
 import 'firebase/auth';
 
 const SignIn = () => {
@@ -9,10 +7,11 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e) => {
+    e.preventDefault();
     const auth = app.auth();
     try {
-      await auth.signInWithNameAndPassword(username, password);
+      await auth.signInWithEmailAndPassword(username, password);
     } catch (error) {
       setError(error.message);
     }
