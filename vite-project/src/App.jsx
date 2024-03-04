@@ -1,17 +1,18 @@
 import './App.css'
 import React, { useState } from 'react';
 import { app } from './firebase/config';
+import SignInForm from './SignIn';
 import 'firebase/auth';
 
-const Login = () => {
-  const [email, setEmail] = useState('');
+const SignIn = () => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
 
-  const handleLogin = async () => {
+  const handleSignIn = async () => {
     const auth = app.auth();
     try {
-      await auth.signInWithEmailAndPassword(email, password);
+      await auth.signInWithNameAndPassword(username, password);
     } catch (error) {
       setError(error.message);
     }
@@ -21,22 +22,22 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Login to Your Account</h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign In to Your Account</h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleSignIn}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
+              <label htmlFor="username" className="sr-only">Username</label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
@@ -69,4 +70,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignIn;
