@@ -1,72 +1,54 @@
+// App.jsx
 import React, { useState } from 'react';
-import { app } from './firebase/config';
-import 'firebase/auth';
+import CreateTemplate from './CreateTemplates';
+import BrowseTemplates from './BrowseTemplates';
 
-const SignIn = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(null);
+function App() {
+  // Define state for managing navigation
+  const [currentPage, setCurrentPage] = useState('choices');
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
-    const auth = app.auth();
-    try {
-      await auth.signInWithEmailAndPassword(username, password);
-    } catch (error) {
-      setError(error.message);
-    }
+  // Function to handle navigation to the create template page
+  const navigateToCreateTemplate = () => {
+    setCurrentPage('create');
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign In to Your Account</h2>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSignIn}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="username" className="sr-only">Username</label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          {error && <p className="text-red-500 text-xs">{error}</p>}
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Sign in
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+  // Function to handle navigation to the browse templates page
+  const navigateToBrowseTemplates = () => {
+    setCurrentPage('browse');
+  };
 
-export default SignIn;
+  // Function to handle navigation back to the choices page
+  const navigateBackToChoices = () => {
+    setCurrentPage('choices');
+  };
+
+  // Render different pages based on the current page
+  let content;
+  if (currentPage === 'create') {
+    content = <CreateTemplate navigateBack={navigateBackToChoices} />;
+  } else if (currentPage === 'browse') {
+    content = <BrowseTemplates navigateBack={navigateBackToChoices} />;
+  } else {
+    content = (
+      <div className="container mx-auto py-8 text-center">
+        <h1 className="text-3xl font-bold mb-8">Fitness Tracker</h1>
+        <button
+          onClick={navigateToCreateTemplate}
+          className="bg-blue-500 text-white px-8 py-4 mr-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+        >
+          Create Template
+        </button>
+        <button
+          onClick={navigateToBrowseTemplates}
+          className="bg-gray-500 text-white px-8 py-4 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+        >
+          Browse Templates
+        </button>
+      </div>
+    );
+  }
+
+  return <div>{content}</div>;
+}
+
+export default App;
