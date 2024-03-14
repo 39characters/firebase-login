@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useState } from 'react';
 import CreateTemplate from './CreateTemplates';
 import BrowseTemplates from './BrowseTemplates';
@@ -30,20 +29,26 @@ function App() {
     content = <BrowseTemplates navigateBack={navigateBackToChoices} />;
   } else {
     content = (
-      <div className="container mx-auto py-8 text-center">
-        <h1 className="text-3xl font-bold mb-8">Fitness Tracker</h1>
-        <button
-          onClick={navigateToCreateTemplate}
-          className="bg-blue-500 text-white px-8 py-4 mr-4 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-        >
-          Create Template
-        </button>
-        <button
-          onClick={navigateToBrowseTemplates}
-          className="bg-gray-500 text-white px-8 py-4 rounded-lg shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-        >
-          Browse Templates
-        </button>
+      <div className="h-screen flex justify-center items-center flex-col">
+        
+        <h1 className="text-9xl font-bold mb-8 bottom-8 relative">Fitness Tracker</h1>
+
+        <p className=" text-lg bottom-12 relative font-semibold">by: Agos Borja, John Valencia</p>
+
+        <div className="flex justify-center">
+          <button
+            onClick={navigateToCreateTemplate}
+            className="bg-slate-900 text-white px-8 py-4 mr-4 rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+          >
+            Create Template
+          </button>
+          <button
+            onClick={navigateToBrowseTemplates}
+            className="bg-slate-900 text-white px-8 py-4 rounded-lg shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+          >
+            Browse Templates
+          </button>
+        </div>
       </div>
     );
   }
