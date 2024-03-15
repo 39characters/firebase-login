@@ -31,7 +31,7 @@ function App() {
     content = (
       <div className="h-screen flex justify-center items-center flex-col">
         
-        <h1 className="text-9xl font-bold mb-8 bottom-8 relative">Fitness Tracker</h1>
+        <h1 className="text-9xl font-bold mb-8 bottom-8 relative drop-shadow-2xl">Fitness Tracker</h1>
 
         <p className=" text-lg bottom-12 relative font-semibold">by: Agos Borja, John Valencia</p>
 

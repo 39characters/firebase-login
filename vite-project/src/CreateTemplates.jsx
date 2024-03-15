@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const CreateTemplate = ({ navigateBack }) => {
   const [name, setName] = useState('');
   const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    // Add a default workout when the component mounts if there are no workouts
+    if (workouts.length === 0) {
+      handleAddWorkout();
+    }
+  }, []); // Empty dependency array to run this effect only once on mount
 
   const handleAddWorkout = () => {
     setWorkouts([...workouts, { name: '', sets: '', reps: '', weight: '', weightUnit: 'lbs' }]);
@@ -21,8 +28,6 @@ const CreateTemplate = ({ navigateBack }) => {
   };
 
   const handleAddTemplate = () => {
-    // Implement the logic to add the template to Firebase or wherever you are storing the data
-    // For now, let's just log the template data
     console.log({ name, workouts });
   };
 
@@ -83,11 +88,11 @@ const CreateTemplate = ({ navigateBack }) => {
               <option value="lbs">lbs</option>
               <option value="kg">kg</option>
             </select>
-            {workouts.length > 1 && ( // Only show the "Remove Workout" button if there's more than one workout
+            {workouts.length > 1 && (
               <button
                 onClick={() => handleRemoveWorkout(index)}
                 className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 mx-auto mt-2"
-                style={{ display: 'block', maxWidth: '200px' }} // Centering the button and limiting its width
+                style={{ display: 'block', maxWidth: '200px' }}
               >
                 Remove Workout
               </button>
@@ -97,7 +102,7 @@ const CreateTemplate = ({ navigateBack }) => {
         <button
           onClick={handleAddWorkout}
           className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-700 mx-auto"
-          style={{ display: 'block', maxWidth: '200px' }} // Centering the button and limiting its width
+          style={{ display: 'block', maxWidth: '200px' }}
         >
           Add Workout
         </button>
@@ -105,7 +110,7 @@ const CreateTemplate = ({ navigateBack }) => {
         <button
           onClick={handleAddTemplate}
           className="bg-slate-900 text-white px-4 py-2 mt-8 rounded-md hover:bg-slate-700 mx-auto"
-          style={{ display: 'block', maxWidth: '200px' }} // Centering the button and limiting its width
+          style={{ display: 'block', maxWidth: '200px' }}
         >
           Save Template
         </button>
