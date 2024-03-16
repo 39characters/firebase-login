@@ -27,7 +27,11 @@ const BrowseTemplates = ({ navigateBack }) => {
   const handleEditWorkout = (workoutIndex, key, value) => {
     const updatedTemplates = [...templates];
     const templateIndex = updatedTemplates.findIndex((template) => template.id === editableTemplateId);
-    updatedTemplates[templateIndex].workouts[workoutIndex][key] = value;
+    if (workoutIndex !== null) {
+      updatedTemplates[templateIndex].workouts[workoutIndex][key] = value;
+    } else {
+      updatedTemplates[templateIndex][key] = value;
+    }
     setTemplates(updatedTemplates);
   };
 
@@ -46,7 +50,7 @@ const BrowseTemplates = ({ navigateBack }) => {
     try {
       const templateRef = doc(db, "templateDatabase", editableTemplateId);
       const template = templates.find((template) => template.id === editableTemplateId);
-      await updateDoc(templateRef, { workouts: template.workouts });
+      await updateDoc(templateRef, { workouts: template.workouts, templateName: template.templateName });
       console.log("Template updated successfully!");
       setEditableTemplateId(null);
       alert("Template updated successfully!");
@@ -59,14 +63,27 @@ const BrowseTemplates = ({ navigateBack }) => {
     setEditableTemplateId(templateId === editableTemplateId ? null : templateId);
   };
 
-  const handleCancelEdit = () => {
-    setEditableTemplateId(null);
+    const handleCancelEdit = () => {
+      setEditableTemplateId(null);
+    };
+
+  const handleAddWorkout = () => {
+    const updatedTemplates = [...templates];
+    const templateIndex = updatedTemplates.findIndex((template) => template.id === editableTemplateId);
+    updatedTemplates[templateIndex].workouts.push({
+      workoutName: '',
+      workoutSets: 0,
+      workoutReps: 0,
+      workoutWeight: 0,
+      workoutWeightType: 'lbs', // Default weight type
+    });
+    setTemplates(updatedTemplates);
   };
+
 
   return (
     <div className="container mx-auto py-8">
       <button
- MPSL
         onClick={navigateBack}
         className="bg-slate-900 text-white px-4 py-2 rounded-md shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-gray-100"
       >
@@ -80,23 +97,23 @@ const BrowseTemplates = ({ navigateBack }) => {
             {editableTemplateId === template.id ? (
               <div>
                 <button
-  onClick={handleSaveChanges}
-  className="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600 flex items-center justify-between absolute top-2 right-2"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 mr-1"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
-      clipRule="evenodd"
-    />
-  </svg>
-  <span className="flex items-center">Save</span>
-</button>
+                  onClick={handleSaveChanges}
+                  className="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600 flex items-center justify-between absolute top-2 right-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="flex items-center">Save</span>
+                </button>
 
                 <button
                   onClick={handleCancelEdit}
@@ -104,31 +121,57 @@ const BrowseTemplates = ({ navigateBack }) => {
                 >
                   Cancel
                 </button>
+                
+                <button
+                        onClick={handleAddWorkout}
+                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 flex items-center justify-between relative top-2 right-2"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-1"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="flex items-center">Add Workout</span>
+                      </button>
 
-
+                {}
+                <input
+                  type="text"
+                  value={template.templateName}
+                  onChange={(e) => handleEditWorkout(null, 'templateName', e.target.value)}
+                  className="border rounded-md p-1 mt-2 w-1/3"
+                />
               </div>
             ) : (
               <button
-  onClick={() => handleEditTemplate(template.id)}
-  className="text-gray-500 hover:text-gray-700 flex items-center ml-auto"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 mr-1"
-    viewBox="0 0 20 20"
-    fill="currentColor"
-  >
-    <path
-      fillRule="evenodd"
-      d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
-      clipRule="evenodd"
-    />
-  </svg>
-  Edit
-</button>
-
+                onClick={() => handleEditTemplate(template.id)}
+                className="text-gray-500 hover:text-gray-700 flex items-center ml-auto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Edit
+              </button>
             )}
-            <h2 className="text-xl font-bold">{template.templateName}</h2>
+            {editableTemplateId !== template.id && (
+              <h2 className="text-xl font-bold">{template.templateName}</h2>
+            )}
             <div className="mt-2">
               {template.workouts.map((workout, index) => (
                 <div key={index} className="mb-2">
