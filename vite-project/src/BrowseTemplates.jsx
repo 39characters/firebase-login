@@ -7,6 +7,7 @@ const BrowseTemplates = ({ navigateBack }) => {
   const db = getFirestore();
   const [templates, setTemplates] = useState([]);
   const [editableTemplateId, setEditableTemplateId] = useState(null);
+  const [originalTemplates, setOriginalTemplates] = useState([]); // Store the original templates state
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -17,6 +18,7 @@ const BrowseTemplates = ({ navigateBack }) => {
           fetchedTemplates.push({ id: doc.id, ...doc.data() });
         });
         setTemplates(fetchedTemplates);
+        setOriginalTemplates(fetchedTemplates); // Initialize original templates state
       } catch (e) {
         console.error("Error fetching templates: ", e);
       }
@@ -64,42 +66,19 @@ const BrowseTemplates = ({ navigateBack }) => {
     setEditableTemplateId(templateId === editableTemplateId ? null : templateId);
   };
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = async () => {
     setEditableTemplateId(null);
-  };
-
-  const handleDeleteTemplate = async (templateId) => {
-    const result = await Swal.fire({
-      title: 'Delete Template',
-      text: 'Are you sure you want to delete this template? This action cannot be undone.',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Delete',
-      cancelButtonText: 'Cancel',
-    });
-  
-    if (result.isConfirmed) {
-      try {
-        await deleteDoc(doc(db, "templateDatabase", templateId));
-        const updatedTemplates = templates.filter((template) => template.id !== templateId);
-        setTemplates(updatedTemplates);
-        Swal.fire({
-          title: 'Template Deleted',
-          icon: 'success',
-          confirmButtonText: 'Ok',
-        });
-      } catch (error) {
-        console.error("Error deleting template: ", error);
-        Swal.fire({
-          title: 'Error',
-          text: 'An error occurred while deleting the template.',
-          icon: 'error',
-          confirmButtonText: 'Ok',
-        });
-      }
+    try {
+      const querySnapshot = await getDocs(collection(db, "templateDatabase"));
+      const fetchedTemplates = [];
+      querySnapshot.forEach((doc) => {
+        fetchedTemplates.push({ id: doc.id, ...doc.data() });
+      });
+      setTemplates(fetchedTemplates);
+    } catch (e) {
+      console.error("Error fetching templates: ", e);
     }
   };
-  
 
   const handleAddWorkout = () => {
     const updatedTemplates = [...templates];
@@ -109,11 +88,10 @@ const BrowseTemplates = ({ navigateBack }) => {
       workoutSets: 0,
       workoutReps: 0,
       workoutWeight: 0,
-      workoutWeightType: 'lbs',
+      workoutWeightType: 'lbs', // Default weight type
     });
     setTemplates(updatedTemplates);
   };
-
 
   return (
     <div className="container mx-auto py-8">
@@ -174,33 +152,33 @@ const BrowseTemplates = ({ navigateBack }) => {
                   </svg>
                   <span className="flex items-center">Delete Template</span>
                 </button>
-                
-                <button
-                        onClick={handleAddWorkout}
-                        className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 flex items-center justify-between relative top-2 right-2"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-1"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="flex items-center">Add Workout</span>
-                      </button>
-
                 {}
-                <input
-                  type="text"
-                  value={template.templateName}
-                  onChange={(e) => handleEditWorkout(null, 'templateName', e.target.value)}
-                  className="border rounded-md p-1 mt-2 w-1/3"
-                />
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    value={template.templateName}
+                    onChange={(e) => handleEditWorkout(null, 'templateName', e.target.value)}
+                    className="border rounded-md p-1 mr-2 w-1/3"
+                  />
+                  <button
+                    onClick={handleAddWorkout}
+                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 flex items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3.293 10.293a1 1 0 011.414 0L10 15.586l5.293-5.293a1 1 0 111.414 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span>Add Workout</span>
+                  </button>
+                </div>
               </div>
             ) : (
               <button
