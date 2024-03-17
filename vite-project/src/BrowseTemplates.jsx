@@ -93,6 +93,35 @@ const BrowseTemplates = ({ navigateBack }) => {
     setTemplates(updatedTemplates);
   };
 
+  const handleDeleteTemplate = async (templateId) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'This action is irreversible. The template will be deleted permanently and cannot be retrieved.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#80',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const templateRef = doc(db, "templateDatabase", templateId);
+        await deleteDoc(templateRef);
+        console.log("Template deleted successfully!");
+        // Update the templates list after deletion
+        const updatedTemplates = templates.filter((template) => template.id !== templateId);
+        setTemplates(updatedTemplates);
+        Swal.fire('Deleted!', 'The template has been deleted.', 'success');
+      } catch (e) {
+        console.error("Error deleting template: ", e);
+        Swal.fire('Error', 'An error occurred while deleting the template.', 'error');
+      }
+    }
+  };
+
+
   return (
     <div className="container mx-auto py-8">
       <button
