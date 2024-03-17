@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "./firebase/config"
-import { getFirestore, addDoc, collection } from "firebase/firestore"; 
-
+import { getFirestore, addDoc, collection, getDocs, query, where } from "firebase/firestore"; 
+import Swal from 'sweetalert2';
 
 const CreateTemplate = ({ navigateBack }) => {
   const [workouts, setWorkouts] = useState([]);
@@ -93,6 +93,30 @@ const CreateTemplate = ({ navigateBack }) => {
 
   const handleAddTemplate = async () => {
     try {
+      if (!templateName.trim()) {
+        alert("Please enter a valid template name.");
+        return; // Stop execution if templateName is empty or contains only whitespace
+      }
+
+      if (workouts.some(workout => workout.sets.trim() === '' || workout.reps.trim() === '' || workout.weight.trim() === '')) {
+        alert("Please fill in all fields for sets, reps, and weight.");
+        return; // Stop execution if any sets, reps, or weight field is empty
+      }
+  
+      if (workouts.length === 1 && workouts[0].name.trim() === '') {
+        alert("Please enter a valid workout name.");
+        return; // Stop execution if the only workout has an empty or whitespace-only name
+      }
+  
+      // Check if the template name already exists
+      const templateRef = collection(db, "templateDatabase");
+      const querySnapshot = await getDocs(query(templateRef, where("templateName", "==", templateName)));
+  
+      if (!querySnapshot.empty) {
+        alert("Template name already exists. Please choose a different name.");
+        return; // Stop execution if the template name already exists
+      }
+
       console.log("Adding template to Firestore...");
       const templateDocRef = await addDoc(collection(db, "templateDatabase"), {
         templateName: templateName,
@@ -106,7 +130,16 @@ const CreateTemplate = ({ navigateBack }) => {
       });
       console.log("Document written with ID: ", templateDocRef.id);
       console.log("Template added successfully!");
-      alert("Document written to Database");
+      Swal.fire({
+        title: 'Document written to Database.',
+        icon: 'success',
+        confirmButtonText: 'Proceed',
+        showCancelButton: false,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.reload();
+        }
+      });
     } catch (e) {
       console.error("Error adding document: ", e);
     }

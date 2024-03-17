@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { getFirestore, collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import "./firebase/config";
+import Swal from 'sweetalert2';
 
 const BrowseTemplates = ({ navigateBack }) => {
   const db = getFirestore();
@@ -63,9 +64,42 @@ const BrowseTemplates = ({ navigateBack }) => {
     setEditableTemplateId(templateId === editableTemplateId ? null : templateId);
   };
 
-    const handleCancelEdit = () => {
-      setEditableTemplateId(null);
-    };
+  const handleCancelEdit = () => {
+    setEditableTemplateId(null);
+  };
+
+  const handleDeleteTemplate = async (templateId) => {
+    const result = await Swal.fire({
+      title: 'Delete Template',
+      text: 'Are you sure you want to delete this template? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await deleteDoc(doc(db, "templateDatabase", templateId));
+        const updatedTemplates = templates.filter((template) => template.id !== templateId);
+        setTemplates(updatedTemplates);
+        Swal.fire({
+          title: 'Template Deleted',
+          icon: 'success',
+          confirmButtonText: 'Ok',
+        });
+      } catch (error) {
+        console.error("Error deleting template: ", error);
+        Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while deleting the template.',
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      }
+    }
+  };
+  
 
   const handleAddWorkout = () => {
     const updatedTemplates = [...templates];
@@ -75,7 +109,7 @@ const BrowseTemplates = ({ navigateBack }) => {
       workoutSets: 0,
       workoutReps: 0,
       workoutWeight: 0,
-      workoutWeightType: 'lbs', // Default weight type
+      workoutWeightType: 'lbs',
     });
     setTemplates(updatedTemplates);
   };
@@ -120,6 +154,25 @@ const BrowseTemplates = ({ navigateBack }) => {
                   className="ml-auto text-gray-500 border border-gray-500 hover:border-gray-700 hover:text-gray-700 px-2.5 py-1 flex items-center rounded-xl transition-all duration-300 w-19 relative top-8 left-2"
                 >
                   Cancel
+                </button>
+
+                <button
+                  onClick={() => handleDeleteTemplate(template.id)}
+                  className="bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 flex items-center justify-between absolute top-2 right-24"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5 6a1 1 0 011-1h8a1 1 0 011 1v1h2a1 1 0 110 2h-1v8a2 2 0 01-2 2H7a2 2 0 01-2-2v-8H4a1 1 0 110-2h2V6zm3-2h4v1H8V4zm3 6a1 1 0 00-1 1v4a1 1 0 102 0v-4a1 1 0 00-1-1zm-3 6a1 1 0 001 1h4a1 1 0 100-2H8a1 1 0 00-1 1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span className="flex items-center">Delete Template</span>
                 </button>
                 
                 <button
